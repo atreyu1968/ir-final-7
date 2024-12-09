@@ -1,0 +1,49 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: docker/node/Dockerfile
+    container_name: innovation-app
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+    volumes:
+      - ./uploads:/app/uploads
+      - ./logs:/app/logs
+
+  db:
+    image: mariadb:10.11
+    container_name: innovation-db
+    restart: unless-stopped
+    environment:
+      - MARIADB_ROOT_PASSWORD=697457697457
+      - MARIADB_DATABASE=innovation_network
+      - MARIADB_USER=innovation_user
+      - MARIADB_PASSWORD=Prod2024Secure!
+    volumes:
+      - db_data:/var/lib/mysql
+      - ./docker/mariadb/init:/docker-entrypoint-initdb.d:ro
+    ports:
+      - "3306:3306"
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin:5.2.1
+    container_name: innovation-phpmyadmin
+    restart: unless-stopped
+    environment:
+      - PMA_HOST=db
+      - PMA_PORT=3306
+      - PMA_USER=innovation_user
+      - PMA_PASSWORD=Prod2024Secure!
+      - UPLOAD_LIMIT=50M
+      - MEMORY_LIMIT=256M
+      - MAX_EXECUTION_TIME=600
+    ports:
+      - "8080:80"
+    depends_on:
+      - db
+
+volumes:
+  db_data:

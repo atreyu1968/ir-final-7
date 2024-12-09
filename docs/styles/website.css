@@ -1,0 +1,104 @@
+/* Variables */
+:root {
+  --primary-color: #2563eb;
+  --secondary-color: #4b5563;
+  --accent-color: #8b5cf6;
+  --text-color: #1f2937;
+  --link-color: #2563eb;
+  --border-color: #e5e7eb;
+  --code-bg: #f3f4f6;
+}
+
+/* Base styles */
+.book {
+  font-family: system-ui, -apple-system, sans-serif;
+  color: var(--text-color);
+}
+
+.book-summary {
+  background: #ffffff;
+  border-right: 1px solid var(--border-color);
+}
+
+/* Headers */
+.markdown-section h1,
+.markdown-section h2,
+.markdown-section h3 {
+  color: var(--primary-color);
+  font-weight: 600;
+  margin-top: 2em;
+}
+
+/* Links */
+.markdown-section a {
+  color: var(--link-color);
+}
+
+.markdown-section a:hover {
+  text-decoration: underline;
+}
+
+/* Code blocks */
+.markdown-section pre {
+  background: var(--code-bg);
+  border-radius: 0.5rem;
+  padding: 1rem;
+}
+
+.markdown-section code {
+  background: var(--code-bg);
+  padding: 0.2em 0.4em;
+  border-radius: 0.25rem;
+}
+
+/* Tables */
+.markdown-section table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1em 0;
+}
+
+.markdown-section table th,
+.markdown-section table td {
+  padding: 0.75rem;
+  border: 1px solid var(--border-color);
+}
+
+.markdown-section table th {
+  background: #f9fafb;
+  font-weight: 600;
+}
+
+/* Notes and hints */
+.hint-container {
+  padding: 1rem;
+  margin: 1rem 0;
+  border-left: 4px solid var(--primary-color);
+  background: #eff6ff;
+  border-radius: 0.5rem;
+}
+
+/* Navigation */
+.book-summary ul.summary li.active > a {
+  color: var(--primary-color);
+  font-weight: 600;
+}
+
+/* Search */
+#book-search-input {
+  padding: 1rem;
+  border-bottom: 1px solid var(--border-color);
+}
+
+/* Print styles */
+@media print {
+  .book-summary,
+  .book-header {
+    display: none;
+  }
+  
+  .book-body {
+    position: static;
+    overflow: visible;
+  }
+}
