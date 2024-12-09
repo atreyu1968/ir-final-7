@@ -1,0 +1,79 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: docker/node/Dockerfile
+    container_name: innovation-app
+    restart: unless-stopped
+    environment:
+      - NODE_ENV=${NODE_ENV:-production}
+      - DB_HOST=${DB_HOST}
+      - DB_PORT=${DB_PORT}
+      - DB_USER=${DB_USER}
+      - DB_PASSWORD=${DB_PASSWORD}
+      - DB_NAME=${DB_NAME}
+      - JWT_SECRET=${JWT_SECRET}
+      - DOMAIN=${DOMAIN}
+      - PROTOCOL=${PROTOCOL}
+      - PORT=${PORT:-3000}
+    volumes:
+      - ./uploads:/app/uploads
+      - ./logs:/app/logs
+    ports:
+      - "${PORT:-3000}:3000"
+    networks:
+      - innovation_net
+    depends_on:
+      db:
+        condition: service_healthy
+
+  db:
+    image: mariadb:10.11
+    container_name: innovation-db
+    restart: unless-stopped
+    environment:
+      - MARIADB_ROOT_PASSWORD=${DB_ROOT_PASSWORD}
+      - MARIADB_DATABASE=${DB_NAME}
+      - MARIADB_USER=${DB_USER}
+      - MARIADB_PASSWORD=${DB_PASSWORD}
+    volumes:
+      - db_data:/var/lib/mysql
+      - ./docker/mariadb/conf.d:/etc/mysql/conf.d:ro
+      - ./docker/mariadb/init:/docker-entrypoint-initdb.d:ro
+    ports:
+      - "127.0.0.1:3306:3306"
+    networks:
+      - innovation_net
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "innovation_user", "--password=Prod2024Secure!"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin:5.2.1
+    container_name: innovation-phpmyadmin
+    restart: unless-stopped
+    environment:
+      - PMA_HOST=db
+      - PMA_PORT=${DB_PORT}
+      - PMA_USER=${DB_USER}
+      - PMA_PASSWORD=${DB_PASSWORD}
+      - UPLOAD_LIMIT=${PMA_UPLOAD_LIMIT:-50M}
+      - MEMORY_LIMIT=${PMA_MEMORY_LIMIT:-256M}
+      - MAX_EXECUTION_TIME=${PMA_MAX_EXECUTION_TIME:-600}
+      - PMA_ABSOLUTE_URI=${PROTOCOL}://${DOMAIN}:${PORT}/phpmyadmin
+    volumes:
+      - ./docker/phpmyadmin/config.user.inc.php:/etc/phpmyadmin/config.user.inc.php:ro
+    networks:
+      - innovation_net
+    depends_on:
+      db:
+        condition: service_healthy
+
+networks:
+  innovation_net:
+    driver: bridge
+
+volumes:
+  db_data:
